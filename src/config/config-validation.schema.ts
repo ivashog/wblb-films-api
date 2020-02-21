@@ -18,20 +18,6 @@ export const configValidationSchema = Joi.object({
     API_PREFIX: Joi.string()
         .uri({ relativeOnly: true })
         .default('api/v1'),
-    JWT_SECRET: Joi.string()
-        .min(20)
-        .required(),
-    /**
-     * Jwt token expiration time.
-     * @member {string} - expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms.js).
-     * @example 60, "2 days", "10h", "7d" etc.
-     */
-    JWT_EXPIRATION: Joi.alternatives().try(
-        Joi.number(),
-        Joi.string()
-            .pattern(zeitMsRegexp)
-            .default('60 seconds'),
-    ),
     TYPEORM_CONNECTION: Joi.string()
         .valid('postgres', 'cockroachdb')
         .default('postgres'),

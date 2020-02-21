@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as path from 'path';
@@ -6,6 +6,10 @@ import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { appConfig, configValidationSchema, databaseConfig, DB_CONFIG_TOKEN } from './config';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { exceptionFactory } from './shared/exceptions/exception.factory';
+import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
+import { GeneralExceptionFilter } from './shared/filters/general-exception.filter';
 
 @Module({
     imports: [
@@ -26,6 +30,23 @@ import { appConfig, configValidationSchema, databaseConfig, DB_CONFIG_TOKEN } fr
         }),
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_PIPE,
+            useValue: new ValidationPipe({
+                transform: true,
+                exceptionFactory,
+            }),
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: LoggingInterceptor,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: GeneralExceptionFilter,
+        },
+    ],
 })
 export class AppModule {}

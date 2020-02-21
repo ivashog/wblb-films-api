@@ -14,7 +14,7 @@ export const appConfig = registerAs(
 
         return {
             env: process.env.NODE_ENV as EnvType,
-            appName: '🛑 ' + appData.name,
+            appName: '🎬 ' + appData.name,
             version: appData.version,
             description: appData.description,
             isProduction: process.env.NODE_ENV === 'production',
