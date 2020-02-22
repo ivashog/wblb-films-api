@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { FormatDictEntity } from './format-dict.entity';
+import { FilmActorEntity } from './film-actor.entity';
 
 @Entity('films')
 export class FilmEntity {
@@ -9,11 +12,14 @@ export class FilmEntity {
     name: string;
 
     @Column({ type: 'smallint' })
-    year: number;
+    releaseYear: number;
 
-    @Column()
-    format: string;
+    @ManyToOne(type => FormatDictEntity)
+    format: FormatDictEntity;
 
-    @Column()
-    actors: string;
+    @OneToMany(
+        type => FilmActorEntity,
+        actor => actor.film,
+    )
+    actors: FilmActorEntity[];
 }
