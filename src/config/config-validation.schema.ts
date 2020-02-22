@@ -27,6 +27,7 @@ export const configValidationSchema = Joi.object({
     TYPEORM_PORT: Joi.number()
         .port()
         .default(5432),
+    TYPEORM_DRIVER_EXTRA: Joi.string().valid('{"ssl":true}'),
     TYPEORM_USERNAME: Joi.string().default('postgres'),
     TYPEORM_PASSWORD: Joi.string().required(),
     TYPEORM_DATABASE: Joi.string().default('postgres'),

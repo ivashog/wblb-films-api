@@ -14,6 +14,7 @@ export const databaseConfig = registerAs(
         schema: process.env.TYPEORM_SCHEMA,
         username: process.env.TYPEORM_USERNAME,
         password: process.env.TYPEORM_PASSWORD,
+        ssl: process.env.TYPEORM_DRIVER_EXTRA === '{"ssl":true}',
         synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
         logging: process.env.TYPEORM_LOGGING as LoggerOptions,
         entities: process.env.TYPEORM_ENTITIES.split(','),
