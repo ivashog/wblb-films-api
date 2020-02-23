@@ -8,7 +8,6 @@ import { FilmFormats } from '../enums';
 @Unique(['name', 'releaseYear'])
 @Entity('films')
 export class FilmEntity {
-    @Exclude()
     @PrimaryGeneratedColumn('increment', { type: 'integer' })
     readonly id: number;
 

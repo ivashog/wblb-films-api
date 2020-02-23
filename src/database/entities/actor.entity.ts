@@ -15,9 +15,11 @@ export class ActorEntity {
     @Column({ type: 'integer', default: 1 })
     filmsCount: number;
 
+    @Exclude()
     @CreateDateColumn({ precision: 0 })
     readonly createdAt: Date;
 
+    @Exclude()
     @UpdateDateColumn({ precision: 0 })
     updatedAt: Date;
 

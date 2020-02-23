@@ -2,7 +2,6 @@ import { Entity, ManyToOne } from 'typeorm';
 
 import { FilmEntity } from './film.entity';
 import { ActorEntity } from './actor.entity';
-import { Transform } from 'class-transformer';
 
 @Entity('film_actors')
 export class FilmActorEntity {

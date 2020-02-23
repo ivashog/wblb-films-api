@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { plainToClass } from 'class-transformer';
 
 import { FilmEntity } from '../database/entities/film.entity';
 import { RawFilm, RawFilmDto } from './dto/raw-film.dto';
 import { AddFilmDto } from './dto/add-film.dto';
 import { ActorEntity } from '../database/entities/actor.entity';
-import { plainToClass } from 'class-transformer';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
+import { CreatedFilmDto } from './dto/created-film.dto';
 
 @Injectable()
 export class FilmsService {
@@ -19,13 +20,13 @@ export class FilmsService {
         private readonly actorRepository: Repository<ActorEntity>,
     ) {}
 
-    async findAll() {
+    async findAll(): Promise<FilmEntity[]> {
         return await this.filmRepository.find({
             order: { name: 'ASC' },
         });
     }
 
-    async create(filmDto: AddFilmDto) {
+    async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {
         const { actors, ...film } = filmDto;
         const actorsEntities = actors.split(',').map(actorName =>
             plainToClass(ActorEntity, {
@@ -37,7 +38,7 @@ export class FilmsService {
             try {
                 const newFilm = await manager.save(plainToClass(FilmEntity, film));
 
-                const { identifiers: createdActors } = await manager
+                const { generatedMaps: createdActors } = await manager
                     .createQueryBuilder()
                     .insert()
                     .into(ActorEntity)
@@ -45,19 +46,25 @@ export class FilmsService {
                     .onConflict(
                         `
                     (full_name) DO UPDATE
-                    SET films_count = EXCLUDED.films_count + 1`,
+                    SET films_count = actors.films_count + 1,
+                        created_at  = actors.created_at,
+                        updated_at  = EXCLUDED.updated_at`,
                     )
+                    .returning('*')
                     .execute();
 
                 const filmActorsEntities = createdActors.map(newActor =>
                     plainToClass(FilmActorEntity, {
                         film: newFilm.id,
-                        actor: newActor.id,
+                        actor: newActor,
                     }),
                 );
                 await manager.save(filmActorsEntities);
 
-                return newFilm;
+                return {
+                    id: newFilm.id,
+                    name: newFilm.name,
+                };
             } catch (e) {
                 Logger.error('Error in film creation transaction: ' + e.message);
                 return null;
@@ -69,20 +76,6 @@ export class FilmsService {
         const filmsData = this.parseTxt(file);
 
         return filmsData;
-    }
-
-    private async upsertActors(actors: ActorEntity[]): Promise<number[]> {
-        const { identifiers } = await this.actorRepository
-            .createQueryBuilder()
-            .insert()
-            .values(actors)
-            .onConflict(
-                `(full_name) DO UPDATE
-                SET films_count = EXCLUDED.films_count + 1`,
-            )
-            .execute();
-
-        return identifiers.map(i => i.id);
     }
 
     private parseTxt(file: Buffer): RawFilmDto[] {

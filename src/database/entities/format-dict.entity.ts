@@ -8,6 +8,6 @@ export class FormatDictEntity {
     @Column('varchar')
     name: string;
 
-    @Column('varchar', { nullable: true })
+    @Column('varchar', { nullable: true, select: false })
     description: string;
 }
