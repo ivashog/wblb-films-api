@@ -3,10 +3,13 @@ import {
     ClassSerializerInterceptor,
     ConflictException,
     Controller,
+    UseInterceptors,
     Get,
     Post,
     UploadedFile,
-    UseInterceptors,
+    Param,
+    ParseIntPipe,
+    NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -20,16 +23,26 @@ import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 
 @Controller('films')
-@UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Films routes')
 export class FilmsController {
     constructor(private readonly filmsService: FilmsService) {}
 
     @Get()
+    @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Get list of films ordered by name' })
     @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
     async getList(): Promise<FilmEntity[]> {
         return await this.filmsService.findAll();
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: 'Get film detail info by id' })
+    async getOneDetails(@Param('id', ParseIntPipe) id: number): Promise<FilmEntity> {
+        const film = await this.filmsService.findOne(id);
+        if (!film) {
+            throw new NotFoundException(`Film with id ${id} is not founded!`);
+        }
+        return film;
     }
 
     @Post()

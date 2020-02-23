@@ -3,7 +3,6 @@ import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryG
 import { FormatDictEntity } from './format-dict.entity';
 import { FilmActorEntity } from './film-actor.entity';
 import { Exclude, Transform } from 'class-transformer';
-import { FilmFormats } from '../enums';
 
 @Unique(['name', 'releaseYear'])
 @Entity('films')
@@ -18,11 +17,11 @@ export class FilmEntity {
     @Column({ type: 'smallint' })
     releaseYear: number;
 
-    @Transform(format => format.name, { toPlainOnly: true })
-    @Transform(format => FilmFormats[format], { toClassOnly: true })
+    @Transform(format => format?.name || format)
     @ManyToOne(type => FormatDictEntity, { eager: true })
     format: FormatDictEntity;
 
+    @Transform(actors => actors.map(item => item.actor), { toClassOnly: true })
     @Transform(actors => actors.map(item => item.actor.fullName), { toPlainOnly: true })
     @OneToMany(
         type => FilmActorEntity,
@@ -31,7 +30,7 @@ export class FilmEntity {
     )
     actors: FilmActorEntity[];
 
-    @Exclude()
+    @Exclude({ toPlainOnly: true })
     @CreateDateColumn({ precision: 0 })
     readonly createdAt: Date;
 }

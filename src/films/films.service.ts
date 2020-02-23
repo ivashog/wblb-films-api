@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, TransformClassToClass } from 'class-transformer';
 
 import { FilmEntity } from '../database/entities/film.entity';
 import { RawFilm, RawFilmDto } from './dto/raw-film.dto';
@@ -26,6 +26,11 @@ export class FilmsService {
         return await this.filmRepository.find({
             order: { name: 'ASC' },
         });
+    }
+
+    @TransformClassToClass()
+    async findOne(id: number): Promise<FilmEntity | undefined> {
+        return await this.filmRepository.findOne(id);
     }
 
     async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {
