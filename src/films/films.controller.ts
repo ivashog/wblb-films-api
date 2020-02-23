@@ -1,20 +1,20 @@
 import {
-    Body,
-    ClassSerializerInterceptor,
-    ConflictException,
-    Controller,
-    UseInterceptors,
     Get,
     Post,
-    UploadedFile,
-    Param,
-    ParseIntPipe,
-    NotFoundException,
     Delete,
+    Body,
+    Param,
+    Query,
     HttpStatus,
     HttpCode,
-    Query,
+    UploadedFile,
+    Controller,
+    UseInterceptors,
+    ParseIntPipe,
+    ClassSerializerInterceptor,
+    ConflictException,
     BadRequestException,
+    NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -36,7 +36,6 @@ export class FilmsController {
     @Get()
     @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Get list of films ordered by name' })
-    @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
     async getList(): Promise<FilmEntity[]> {
         return await this.filmsService.findAll();
     }
@@ -44,7 +43,8 @@ export class FilmsController {
     @Get('/search')
     @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Search films by name or actor' })
-    async search(@Query() searchDto: SearchFilmsDto) {
+    @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
+    async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
 
         if (!name && !actor) {
