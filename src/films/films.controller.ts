@@ -10,6 +10,9 @@ import {
     Param,
     ParseIntPipe,
     NotFoundException,
+    Delete,
+    HttpStatus,
+    HttpCode,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -53,6 +56,17 @@ export class FilmsController {
             throw new ConflictException(`Film with same name and year already exists!`);
         }
         return newFilm;
+    }
+
+    @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: 'Delete film by id' })
+    async dropFilm(@Param('id', ParseIntPipe) id: number) {
+        const film = await this.filmsService.findOne(id);
+        if (!film) {
+            throw new NotFoundException(`Film with id ${id} is not founded!`);
+        }
+        await this.filmsService.delete(id);
     }
 
     @Post('import')

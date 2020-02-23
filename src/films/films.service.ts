@@ -79,6 +79,10 @@ export class FilmsService {
         });
     }
 
+    async delete(id: number) {
+        return await this.filmRepository.delete(id);
+    }
+
     async batchCreate(rawFilmsData: RawFilmDto[]): Promise<FilmsImportResDto> {
         const response = new FilmsImportResDto();
 
