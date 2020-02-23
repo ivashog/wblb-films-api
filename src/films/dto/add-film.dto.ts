@@ -1,7 +1,8 @@
-import { IsIn, IsInt, IsNotEmpty, IsString, Length, Max, Min, MinLength } from 'class-validator';
+import { IsIn, IsInt, IsString, Length, Max, Min, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { FilmFormats } from '../../database/enums';
 import { EnumValues } from 'enum-values';
+
+import { FilmFormats } from '../../database/enums';
 
 export class AddFilmDto {
     @IsString()

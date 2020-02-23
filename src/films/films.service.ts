@@ -9,6 +9,8 @@ import { AddFilmDto } from './dto/add-film.dto';
 import { ActorEntity } from '../database/entities/actor.entity';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmDto } from './dto/created-film.dto';
+import { validate } from 'class-validator';
+import { FilmsImportResDto } from './dto/films-import-res.dto';
 
 @Injectable()
 export class FilmsService {
@@ -72,13 +74,33 @@ export class FilmsService {
         });
     }
 
-    async importFromFile(file: Buffer) {
-        const filmsData = this.parseTxt(file);
+    async batchCreate(rawFilmsData: RawFilmDto[]): Promise<FilmsImportResDto> {
+        const response = new FilmsImportResDto();
 
-        return filmsData;
+        for await (const rawFilm of rawFilmsData) {
+            const filmDto = plainToClass(AddFilmDto, rawFilm);
+            const errors = await validate(filmDto);
+            if (errors.length) {
+                response.errors.push({ value: rawFilm, error: errors });
+                continue;
+            }
+
+            const newFilm = await this.create(filmDto);
+            if (!newFilm) {
+                response.errors.push({
+                    value: filmDto,
+                    error: 'Film with same name and year already exists!',
+                });
+                continue;
+            }
+
+            response.data.push(newFilm);
+        }
+
+        return response;
     }
 
-    private parseTxt(file: Buffer): RawFilmDto[] {
+    public parseTxt(file: Buffer): RawFilmDto[] {
         const ROWS_SEPARATOR = '\r\n';
         const ATTR_SEPARATOR = /:\s(.+)/; // this regexp need for process values with ': ' symbols
         const FILM_PARSER_SCHEMA: RawFilm = {
