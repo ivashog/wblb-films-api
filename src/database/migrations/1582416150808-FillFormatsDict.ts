@@ -1,14 +1,15 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { FilmFormats } from '../enums';
 
 export class FillFormatsDict1582416150808 implements MigrationInterface {
     name = 'FillFormatsDict1582416150808';
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.query(`
-            INSERT INTO public.formats_dict (name) VALUES
-                ('VHS'),
-                ('DVD'),
-                ('Blu-Ray');
+            INSERT INTO public.formats_dict (id, name) VALUES
+                (${FilmFormats.VHS}, 'VHS'),
+                (${FilmFormats.DVD}, 'DVD'),
+                (${FilmFormats['Blu-Ray']}, 'Blu-Ray');
         `);
     }
 
