@@ -10,6 +10,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { exceptionFactory } from './shared/exceptions/exception.factory';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { GeneralExceptionFilter } from './shared/filters/general-exception.filter';
+import { FilmsModule } from './films/films.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { GeneralExceptionFilter } from './shared/filters/general-exception.filte
             useFactory: (config: ConfigService) => config.get<TypeOrmModuleOptions>(DB_CONFIG_TOKEN),
             inject: [ConfigService],
         }),
+        FilmsModule,
     ],
     controllers: [AppController],
     providers: [
