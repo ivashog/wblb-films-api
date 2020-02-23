@@ -13,6 +13,8 @@ import {
     Delete,
     HttpStatus,
     HttpCode,
+    Query,
+    BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -24,6 +26,7 @@ import { CreatedFilmDto } from './dto/created-film.dto';
 import { FilmPlainResDto } from './dto/film-plain-res.dto';
 import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
+import { SearchFilmsDto } from './dto/search-films.dto';
 
 @Controller('films')
 @ApiTags('Films routes')
@@ -38,7 +41,20 @@ export class FilmsController {
         return await this.filmsService.findAll();
     }
 
-    @Get(':id')
+    @Get('/search')
+    @UseInterceptors(ClassSerializerInterceptor)
+    @ApiOperation({ summary: 'Search films by name or actor' })
+    async search(@Query() searchDto: SearchFilmsDto) {
+        const { name, actor } = searchDto;
+
+        if (!name && !actor) {
+            throw new BadRequestException(`One of ['name', 'actor'] query params must be specified`);
+        }
+        if (name) return await this.filmsService.findByName(name);
+        if (actor) return await this.filmsService.findByActor(actor);
+    }
+
+    @Get('/:id')
     @ApiOperation({ summary: 'Get film detail info by id' })
     async getOneDetails(@Param('id', ParseIntPipe) id: number): Promise<FilmEntity> {
         const film = await this.filmsService.findOne(id);

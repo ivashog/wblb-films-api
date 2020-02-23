@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, Like, Repository } from 'typeorm';
 import { plainToClass, TransformClassToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 
 import { FilmEntity } from '../database/entities/film.entity';
 import { RawFilm, RawFilmDto } from './dto/raw-film.dto';
@@ -9,7 +10,6 @@ import { AddFilmDto } from './dto/add-film.dto';
 import { ActorEntity } from '../database/entities/actor.entity';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmDto } from './dto/created-film.dto';
-import { validate } from 'class-validator';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 
 @Injectable()
@@ -31,6 +31,24 @@ export class FilmsService {
     @TransformClassToClass()
     async findOne(id: number): Promise<FilmEntity | undefined> {
         return await this.filmRepository.findOne(id);
+    }
+
+    async findByName(name: string): Promise<FilmEntity[]> {
+        return await this.filmRepository.find({
+            where: { name: Like(`%${name}%`) },
+            order: { name: 'ASC', releaseYear: 'DESC' },
+        });
+    }
+
+    async findByActor(actor: string) {
+        return await this.filmRepository
+            .createQueryBuilder('f')
+            .leftJoinAndSelect('f.actors', 'filmAct')
+            .leftJoinAndSelect('filmAct.actor', 'actor')
+            .where(`actor.fullName ILIKE '%${actor}%'`)
+            .orderBy('f.name', 'ASC')
+            .addOrderBy('f.releaseYear', 'DESC')
+            .getMany();
     }
 
     async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {

@@ -25,7 +25,7 @@ export class ActorEntity {
 
     @OneToMany(
         type => FilmActorEntity,
-        film => film.film,
+        films => films.film,
     )
-    films: FilmActorEntity;
+    films: FilmActorEntity[];
 }

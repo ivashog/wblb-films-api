@@ -16,9 +16,7 @@ export class AddFilmDto {
     releaseYear: number;
 
     @IsIn(EnumValues.getValues(FilmFormats))
-    @Transform(format => {
-        return FilmFormats[format];
-    })
+    @Transform(format => FilmFormats[format])
     format: FilmFormats;
 
     @MinLength(5)
