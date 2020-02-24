@@ -11,6 +11,7 @@ import { ActorEntity } from '../database/entities/actor.entity';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmDto } from './dto/created-film.dto';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
+import { SearchFilmsDto } from './dto/search-films.dto';
 
 @Injectable()
 export class FilmsService {
@@ -33,22 +34,20 @@ export class FilmsService {
         return await this.filmRepository.findOne(id);
     }
 
-    async findByName(name: string): Promise<FilmEntity[]> {
-        return await this.filmRepository.find({
-            where: { name: Like(`%${name}%`) },
-            order: { name: 'ASC', releaseYear: 'DESC' },
-        });
-    }
+    async find(searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
+        const { name, actor } = searchDto;
 
-    async findByActor(actor: string) {
-        return await this.filmRepository
-            .createQueryBuilder('f')
-            .leftJoinAndSelect('f.actors', 'filmAct')
+        let qb = this.filmRepository
+            .createQueryBuilder('film')
+            .leftJoinAndSelect('film.actors', 'filmAct')
             .leftJoinAndSelect('filmAct.actor', 'actor')
-            .where(`actor.fullName ILIKE '%${actor}%'`)
-            .orderBy('f.name', 'ASC')
-            .addOrderBy('f.releaseYear', 'DESC')
-            .getMany();
+            .orderBy('film.name', 'ASC')
+            .addOrderBy('film.releaseYear', 'DESC');
+
+        if (name) qb = qb.where(`film.name ILIKE '%${name}%'`);
+        if (actor) qb = qb.where(`actor.fullName ILIKE '%${actor}%'`);
+
+        return await qb.getMany();
     }
 
     async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {
@@ -141,8 +140,11 @@ export class FilmsService {
 
         return filmsRawItems.map(rawFilm =>
             rawFilm.split(ROWS_SEPARATOR).reduce((filmObj: RawFilmDto, filmAttr) => {
-                const [parseKey, parseValue] = filmAttr.split(ATTR_SEPARATOR);
-                const [objKey] = Object.entries(FILM_PARSER_SCHEMA).find(([, rawKey]) => rawKey === parseKey);
+                const [parseKey, parseValue = ''] = filmAttr.split(ATTR_SEPARATOR);
+                const [objKey] = Object.entries(FILM_PARSER_SCHEMA).find(([, rawKey]) => rawKey === parseKey) || [
+                    parseKey,
+                ];
+                if (!objKey) return filmObj;
                 return { ...filmObj, [objKey]: parseValue.trim() };
             }, new RawFilmDto()),
         );

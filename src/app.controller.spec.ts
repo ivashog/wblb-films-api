@@ -15,8 +15,8 @@ describe('AppController', () => {
     });
 
     describe('root', () => {
-        it('should return "Hello World!"', () => {
-            expect(appController.getHello()).toBe('Hello, WebbyLab films API!');
+        it('should return "Hello, WebbyLab!"', () => {
+            expect(appController.getHello()).toBe('Hello, WebbyLab!');
         });
     });
 });

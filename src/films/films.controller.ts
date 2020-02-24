@@ -36,6 +36,7 @@ export class FilmsController {
     @Get()
     @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Get list of films ordered by name' })
+    @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
     async getList(): Promise<FilmEntity[]> {
         return await this.filmsService.findAll();
     }
@@ -46,12 +47,12 @@ export class FilmsController {
     @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
     async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
-
-        if (!name && !actor) {
-            throw new BadRequestException(`One of ['name', 'actor'] query params must be specified`);
+        if ((!name && !actor) || (name && actor)) {
+            throw new BadRequestException(
+                `One of ['name', 'actor'] query params must be specified`,
+            );
         }
-        if (name) return await this.filmsService.findByName(name);
-        if (actor) return await this.filmsService.findByActor(actor);
+        return await this.filmsService.find(searchDto);
     }
 
     @Get('/:id')
