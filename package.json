@@ -34,7 +34,6 @@
     "@nestjs/platform-express": "^6.11.5",
     "@nestjs/swagger": "^4.2.3",
     "@nestjs/typeorm": "^6.2.0",
-    "async-exit-hook": "^2.0.1",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",
     "dotenv": "^8.2.0",

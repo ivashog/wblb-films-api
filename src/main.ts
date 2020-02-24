@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import * as exitHook from 'async-exit-hook';
 
 import { AppModule } from './app.module';
 import { AppConfig, APP_CONFIG_TOKEN } from './config';
@@ -41,6 +40,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(apiDocsPath, app, document);
 
+    app.enableShutdownHooks();
     // tslint:disable
     /*
      * This hook isProduction ? process.env.PORT : port
@@ -53,17 +53,6 @@ async function bootstrap() {
 
     logger.log(`${appName} is listening at ${serverUrl}`);
     logger.log(`Swagger is exposed at ${serverUrl}${apiDocsPath}`);
-
-    /*
-     * Graceful shutdown
-     * @see https://12factor.net/disposability
-     */
-    exitHook(callback => {
-        app.close().then(() => {
-            logger.log('Graceful shutdown the server');
-            callback();
-        });
-    });
 }
 
 bootstrap().catch(e => Logger.error(e));
