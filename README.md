@@ -11,12 +11,11 @@
 - [Database schema](#database-schema)
 - [Project structure tree](#project-structure-tree)
 - [Support](#support)
-
 ## Description
   
 REST API for WebbyLab test project.
 
-[Swagger docs](http://localhost:4000/swagger) and [OpenAPI 3.0 specification](http://localhost:4000/swagger-json).
+[Swagger docs](https://wblb-films-api.herokuapp.com/swagger) and [OpenAPI 3.0 specification](https://wblb-films-api.herokuapp.com/swagger-json).
 
 Building with:
 
@@ -123,8 +122,12 @@ $ npm run test:cov
 
 ## API docs
 
--   Swagger [http://localhost:4000/swagger](http://localhost:4000/swagger)
--   OpenAPI Specification [http://localhost:4000/swagger-json](http://localhost:4000/swagger-json)
+-   Production
+    -   Swagger [https://wblb-films-api.herokuapp.com/swagger](https://wblb-films-api.herokuapp.com/swagger)
+    -   OpenAPI Specification [https://wblb-films-api.herokuapp.com/swagger-json](https://wblb-films-api.herokuapp.com/swagger-json)
+-   Local
+    -   Swagger [http://localhost:4000/swagger](http://localhost:4000/swagger)
+    -   OpenAPI Specification [http://localhost:4000/swagger-json](http://localhost:4000/swagger-json)
 
 ## Database schema:
  ![](docs/db-schema.png)
@@ -132,34 +135,34 @@ $ npm run test:cov
 ## Project structure tree
 
 ```
-    ├─ dist                               - folder with compiled *.js files (has same structure that /src)                      
-    ├─ docs                               - app documents and assets
-    ├─ node_modules                       - 
-    ├─ src                                - main project folder fith source *.ts files
-    │  ├─ config                            - project configuration files
-    │  ├─ database                          - databse entities and tools
-    │  |  ├─ entities                         - database models (entities) classes, that represent db tables
-    │  |  └─ migrations                       - database migration classes
-    │  ├─ films                             - film module files (main domain logic of this project)
-    |  |  └─ dto                              - data transfer objects classes, used validation, mapping and documentation            
-    |  |  films.controller.spec.ts            - controller unit tests
-    |  |  films.controller.ts                 - controller class with api roures declarations
-    |  |  films.module.ts                     - films module class
-    |  |  films.service.spec.ts               - service unit tests
-    |  |  films.service.ts                    - films service class with methods that implement main app business logic
-    |  └─ shared                            - common functions and tools that can be used in any app module
-    |  ...                                 ...
-    │  app.module.ts                       - root app module, configure and connect all app domain modules
-    │  main.ts                             - entry point of app that bootstrap app module
-    └─ test                               - folder for e2e tests
-    .env.example                          - example envirement configuration file
-    .prettierrc                           - prettier configuration file
-    nest-cli.json                         - nest-cli config
-    ormconfig.example.js                  - example typeorm configuration file, used for working with migrations CLI
-    package.json                          - 
-    README.md                             - 
-    tsconfig.json                         - typescript compiler configuration
-    tslint.json                           - tslint configuration
+    ├─ dist                         - folder with compiled *.js files (has same structure that /src)                      
+    ├─ docs                         - app documents and assets
+    ├─ node_modules                 - 
+    ├─ src                          - main project folder fith source *.ts files
+    │  ├─ config                      - project configuration files
+    │  ├─ database                    - databse entities and tools
+    │  |  ├─ entities                   - database models (entities) classes, that represent db tables
+    │  |  └─ migrations                 - database migration classes
+    │  ├─ films                       - film module files (main domain logic of this project)
+    |  |  └─ dto                        - data transfer objects classes, used validation, mapping and documentation            
+    |  |  films.controller.spec.ts      - controller unit tests
+    |  |  films.controller.ts           - controller class with api roures declarations
+    |  |  films.module.ts               - films module class
+    |  |  films.service.spec.ts         - service unit tests
+    |  |  films.service.ts              - films service class with methods that implement main app business logic
+    |  └─ shared                      - common functions and tools that can be used in any app module
+    |  ...                           ...
+    │  app.module.ts                 - root app module, configure and connect all app domain modules
+    │  main.ts                       - entry point of app that bootstrap app module
+    └─ test                         - folder for e2e tests
+    .env.example                    - example envirement configuration file
+    .prettierrc                     - prettier configuration file
+    nest-cli.json                   - nest-cli config
+    ormconfig.example.js            - example typeorm configuration file, used for working with migrations CLI
+    package.json                    - 
+    README.md                       - 
+    tsconfig.json                   - typescript compiler configuration
+    tslint.json                     - tslint configuration
 
 ```
 
