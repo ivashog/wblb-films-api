@@ -1,0 +1,18 @@
+pipelines:
+  default:
+    - step:
+        name: Create artifact
+        script:
+          - tar czfv app.tgz *
+        artifacts:
+          - app.tgz
+    - step:
+        name: Deploy to production
+        deployment: production
+        script:
+          - pipe: atlassian/heroku-deploy:0.1.1
+            variables:
+              HEROKU_API_KEY: $HEROKU_API_KEY
+              HEROKU_APP_NAME: $HEROKU_APP_NAME
+              ZIP_FILE: "app.tgz"
+              WAIT: 'true'
