@@ -17,6 +17,7 @@ import { FilmsModule } from './films/films.module';
         ConfigModule.forRoot({
             // isGlobal: true,
             envFilePath: path.resolve(process.cwd(), `${process.env.NODE_ENV || 'development'}.env`),
+            ignoreEnvFile: process.env.NODE_ENV === 'production', // it is used for heroku production deploy
             validationSchema: configValidationSchema,
             validationOptions: {
                 allowUnknown: true,
