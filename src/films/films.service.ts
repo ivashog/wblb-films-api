@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Like, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { plainToClass, TransformClassToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 

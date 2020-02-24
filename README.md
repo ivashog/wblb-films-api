@@ -1,53 +1,112 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# 🎬 WBLB-FILMS-API
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- [Description](#description)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the app](#running-the-app)
+- [DB migrations](#db-migrations)
+- [DB seeding](#db-seeding)
+- [Test](#test)
+- [API docs](#api-docs)
+- [Database schema](#database-schema)
+- [Project structure tree](#project-structure-tree)
+- [Support](#support)
 
 ## Description
+  
+REST API for WebbyLab test project. <br/>
+[Swagger docs](http://localhost:4000/swagger) and [OpenAPI 3.0 specification](http://localhost:4000/swagger-json). <br/>
+Building with:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<p>
+    <a href="http://nestjs.com/" target="blank">
+       <img src="https://nestjs.com/img/logo_text.svg" height="45" alt="NestJS logo" />
+    </a> 
+    <a href="https://www.typescriptlang.org/" target="blank">
+        <img src="https://raw.githubusercontent.com/remojansen/logo.ts/master/ts.png"height="40" alt="TypeScript logo" />
+    </a>
+    <a href="https://www.postgresql.org/" target="blank">
+           <img src="https://www.postgresql.org/media/img/about/press/elephant.png" width="40" alt="PostgreSQL logo" />
+        </a>
+    <a href="https://typeorm.io/" target="blank">
+       <img src="https://github.com/typeorm/typeorm/raw/master/resources/logo_big.png" height="40" alt="TypeORM logo" />
+    </a>
+   
+ </p>
 
 ## Installation
 
+First of all make sure you have install following software on you machine:
+
+-   [Node.js](https://nodejs.org/) version 10+
+-   [PostgreSQL](https://www.postgresql.org/) version 11+ (if you want use local database)
+
 ```bash
+$ git clone git@bitbucket.org:ivashog/wblb-films-api.git
+$ cd wblb-films-api
 $ npm install
 ```
 
+## Configuration
+
+Before first running app configure you project environments:
+
+-   copy `.env.example` to `development.env` (or `production.env` for production mode)
+-   set up you environments variables for use app
+-   run one of the following command:
+-   If you want use TypeORM migrations CLI or typeorm-seeding CLI you mast create `ormconfig.js` from `ormconfig.example.js`*
+
+```
+* You can running app on new clean db in two way:
+  1. Sepup envirement variable TYPEORM_MIGRATIONS_RUN = true, that automaticaly run migrations on app start
+  2. Manualy run migration with `npm run migrate` command (for that you must configure `ormconfig.js` file)
+```
 ## Running the app
 
 ```bash
-# development
+# Development mode
 $ npm run start
 
-# watch mode
+# Watch development mode
 $ npm run start:dev
 
-# production mode
+# Production mode
+$ npm run build
 $ npm run start:prod
 ```
 
+more scripts view in `package.json` file.
+
+## DB migrations
+
+```bash
+
+# run migration (running all migartions)
+$ npm run migrate
+
+# migration rollback (rollback only last migration!)
+$ npm run migration:revert
+
+# create new migration manually
+$ npm run migration:create -- "YouMigrationName"
+
+# generate new migration from entity changes you made
+$ npm run migration:generate -- "YouMigrationName"
+
+```
+
+## DB seeding
+
+```bash
+
+# run certain seed from src/database/seeds folder
+$ npm run seed -- CertainSeedClassName
+
+```
+
 ## Test
+
+**WIP...**
 
 ```bash
 # unit tests
@@ -60,16 +119,48 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+## API docs
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+-   Swagger [http://localhost:4000/swagger](http://localhost:4000/swagger)
+-   OpenAPI Specification [http://localhost:4000/swagger-json](http://localhost:4000/swagger-json)
 
-## Stay in touch
+## Database schema:
+ ![](docs/db-schema.png)
+ 
+## Project structure tree
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+    ├─ dist                               - folder with compiled *.js files (has same structure that /src)                      
+    ├─ docs                               - app documents and assets
+    ├─ node_modules                       - 
+    ├─ src                                - main project folder fith source *.ts files
+    │  ├─ config                            - project configuration files
+    │  ├─ database                          - databse entities and tools
+    │  |  ├─ entities                         - database models (entities) classes, that represent db tables
+    │  |  └─ migrations                       - database migration classes
+    │  ├─ films                             - film module files (main domain logic of this project)
+    |  |  └─ dto                              - data transfer objects classes, used validation, mapping and documentation            
+    |  |  films.controller.spec.ts            - controller unit tests
+    |  |  films.controller.ts                 - controller class with api roures declarations
+    |  |  films.module.ts                     - films module class
+    |  |  films.service.spec.ts               - service unit tests
+    |  |  films.service.ts                    - films service class with methods that implement main app business logic
+    |  └─ shared                            - common functions and tools that can be used in any app module
+    |  ...                                 ...
+    │  app.module.ts                       - root app module, configure and connect all app domain modules
+    │  main.ts                             - entry point of app that bootstrap app module
+    └─ test                               - folder for e2e tests
+    .env.example                          - example envirement configuration file
+    .prettierrc                           - prettier configuration file
+    nest-cli.json                         - nest-cli config
+    ormconfig.example.js                  - example typeorm configuration file, used for working with migrations CLI
+    package.json                          - 
+    README.md                             - 
+    tsconfig.json                         - typescript compiler configuration
+    tslint.json                           - tslint configuration
 
-## License
+```
 
-  Nest is [MIT licensed](LICENSE).
+## Support 
+
+Find bug? - [Report it here](https://bitbucket.org/ivashog/wblb-films-api/issues?status=new&status=open)
