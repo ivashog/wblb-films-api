@@ -40,7 +40,15 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(apiDocsPath, app, document);
 
-    await app.listen(port);
+    // tslint:disable
+    /*
+     * This hook isProduction ? process.env.PORT : port
+     * used for deploying to Heroku, because Heroku dynamically
+     * assigns your app a port, so you can't set the port to a fixed number.
+     * Heroku adds the port to the env
+     * @see https://stackoverflow.com/questions/15693192/heroku-node-js-error-web-process-failed-to-bind-to-port-within-60-seconds-of
+     */
+    await app.listen(isProduction ? process.env.PORT : port);
 
     logger.log(`${appName} is listening at ${serverUrl}`);
     logger.log(`Swagger is exposed at ${serverUrl}${apiDocsPath}`);
