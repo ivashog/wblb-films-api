@@ -14,8 +14,10 @@
 
 ## Description
   
-REST API for WebbyLab test project. <br/>
-[Swagger docs](http://localhost:4000/swagger) and [OpenAPI 3.0 specification](http://localhost:4000/swagger-json). <br/>
+REST API for WebbyLab test project.
+
+[Swagger docs](http://localhost:4000/swagger) and [OpenAPI 3.0 specification](http://localhost:4000/swagger-json).
+
 Building with:
 
 <p>
