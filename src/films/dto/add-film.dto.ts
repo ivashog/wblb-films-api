@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import { EnumValues } from 'enum-values';
 
 import { FilmFormats } from '../../database/enums';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AddFilmDto {
     @IsString()
@@ -19,6 +20,7 @@ export class AddFilmDto {
     @Transform(format => FilmFormats[format])
     format: FilmFormats;
 
+    @ApiProperty({ description: 'List of comma separated actors full names' })
     @Matches(/^[\D\s]+(?:,[\D\s]*)*$/, {
         message: 'Actors names list can not contain numbers!',
     })

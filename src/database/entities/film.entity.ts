@@ -11,7 +11,7 @@ export class FilmEntity {
     readonly id: number;
 
     @Index()
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, collation: 'C' })
     name: string;
 
     @Column({ type: 'smallint' })
