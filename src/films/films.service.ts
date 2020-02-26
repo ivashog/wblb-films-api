@@ -52,11 +52,14 @@ export class FilmsService {
 
     async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {
         const { actors, ...film } = filmDto;
-        const actorsEntities = actors.split(',').map(actorName =>
-            plainToClass(ActorEntity, {
-                fullName: actorName.trim(),
-            }),
-        );
+        const actorsEntities = actors
+            .split(',')
+            .filter(a => a.trim())
+            .map(actorName =>
+                plainToClass(ActorEntity, {
+                    fullName: actorName.trim(),
+                }),
+            );
 
         return await this.connection.transaction(async manager => {
             try {

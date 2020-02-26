@@ -48,9 +48,7 @@ export class FilmsController {
     async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
         if ((!name && !actor) || (name && actor)) {
-            throw new BadRequestException(
-                `One of ['name', 'actor'] query params must be specified`,
-            );
+            throw new BadRequestException(`One of ['name', 'actor'] query params must be specified`);
         }
         return await this.filmsService.find(searchDto);
     }

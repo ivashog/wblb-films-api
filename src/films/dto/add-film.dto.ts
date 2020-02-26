@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsString, Length, Max, Min, MinLength } from 'class-validator';
+import { IsIn, IsInt, IsString, Length, Matches, Max, Min, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { EnumValues } from 'enum-values';
 
@@ -19,6 +19,9 @@ export class AddFilmDto {
     @Transform(format => FilmFormats[format])
     format: FilmFormats;
 
+    @Matches(/^[\D\s]+(?:,[\D\s]*)*$/, {
+        message: 'Actors names list can not contain numbers!',
+    })
     @MinLength(5)
     @IsString()
     actors: string;
