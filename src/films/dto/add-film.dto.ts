@@ -1,9 +1,9 @@
 import { IsIn, IsInt, IsString, Length, Matches, Max, Min, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { EnumValues } from 'enum-values';
 
 import { FilmFormats } from '../../database/enums';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class AddFilmDto {
     @IsString()

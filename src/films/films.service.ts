@@ -12,6 +12,7 @@ import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmDto } from './dto/created-film.dto';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 import { SearchFilmsDto } from './dto/search-films.dto';
+import { SortOrder } from './dto/sorting.dto';
 
 @Injectable()
 export class FilmsService {
@@ -23,9 +24,9 @@ export class FilmsService {
         private readonly actorRepository: Repository<ActorEntity>,
     ) {}
 
-    async findAll(): Promise<FilmEntity[]> {
+    async findAll(order: SortOrder): Promise<FilmEntity[]> {
         return await this.filmRepository.find({
-            order: { name: 'ASC' },
+            order: { name: order },
         });
     }
 
