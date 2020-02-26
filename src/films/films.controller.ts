@@ -27,6 +27,7 @@ import { FilmPlainResDto } from './dto/film-plain-res.dto';
 import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 import { SearchFilmsDto } from './dto/search-films.dto';
+import { SortingDto } from './dto/sorting.dto';
 
 @Controller('films')
 @ApiTags('Films routes')
@@ -37,8 +38,8 @@ export class FilmsController {
     @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Get list of films ordered by name' })
     @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
-    async getList(): Promise<FilmEntity[]> {
-        return await this.filmsService.findAll();
+    async getList(@Query() sort: SortingDto): Promise<FilmEntity[]> {
+        return await this.filmsService.findAll(sort.order);
     }
 
     @Get('/search')
@@ -48,9 +49,7 @@ export class FilmsController {
     async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
         if ((!name && !actor) || (name && actor)) {
-            throw new BadRequestException(
-                `One of ['name', 'actor'] query params must be specified`,
-            );
+            throw new BadRequestException(`One of ['name', 'actor'] query params must be specified`);
         }
         return await this.filmsService.find(searchDto);
     }

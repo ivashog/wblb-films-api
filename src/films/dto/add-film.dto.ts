@@ -1,5 +1,6 @@
-import { IsIn, IsInt, IsString, Length, Max, Min, MinLength } from 'class-validator';
+import { IsIn, IsInt, IsString, Length, Matches, Max, Min, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { EnumValues } from 'enum-values';
 
 import { FilmFormats } from '../../database/enums';
@@ -19,6 +20,10 @@ export class AddFilmDto {
     @Transform(format => FilmFormats[format])
     format: FilmFormats;
 
+    @ApiProperty({ description: 'List of comma separated actors full names' })
+    @Matches(/^[\D\s]+(?:,[\D\s]*)*$/, {
+        message: 'Actors names list can not contain numbers!',
+    })
     @MinLength(5)
     @IsString()
     actors: string;

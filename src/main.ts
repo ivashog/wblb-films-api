@@ -40,6 +40,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup(apiDocsPath, app, document);
 
+    app.enableShutdownHooks();
     // tslint:disable
     /*
      * This hook isProduction ? process.env.PORT : port

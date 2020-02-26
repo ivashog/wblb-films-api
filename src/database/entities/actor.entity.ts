@@ -23,6 +23,9 @@ export class ActorEntity {
     @UpdateDateColumn({ precision: 0 })
     updatedAt: Date;
 
-    @OneToMany(type => FilmActorEntity, films => films.film)
+    @OneToMany(
+        type => FilmActorEntity,
+        films => films.film,
+    )
     films: FilmActorEntity[];
 }
