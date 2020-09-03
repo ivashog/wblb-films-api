@@ -24,7 +24,8 @@
     "migration:generate": "npm run typeorm -- migration:generate -n",
     "migrate": "npm run typeorm -- migration:run -t=false",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --class"
+    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --class",
+    "release": "standard-version"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.0",
@@ -62,6 +63,7 @@
     "@types/supertest": "^2.0.8",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
+    "standard-version": "^9.0.0",
     "supertest": "^4.0.2",
     "ts-jest": "^24.3.0",
     "ts-loader": "^6.1.1",
