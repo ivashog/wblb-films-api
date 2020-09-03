@@ -1,0 +1,5 @@
+node_modules/
+dist/
+migrations/
+package.json
+package-lock.json

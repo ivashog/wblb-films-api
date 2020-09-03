@@ -16,7 +16,7 @@ export class GeneralExceptionFilter<T> implements ExceptionFilter {
             path: request.url,
             method: request.method,
             timestamp: new Date().toLocaleString(),
-            errors: this.getErrorFromException(exception),
+            errors: this._getErrorFromException(exception),
         };
 
         if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
@@ -27,10 +27,10 @@ export class GeneralExceptionFilter<T> implements ExceptionFilter {
         response.status(status).json(errorResponse);
     }
 
-    private getErrorFromException(exception: HttpException): string {
+    private _getErrorFromException = (exception: HttpException): string | object => {
         if (!(exception instanceof HttpException)) {
             return 'Internal server error';
         }
-        return exception.message.message || exception.message || exception.getResponse() || null;
-    }
+        return exception.getResponse() || null;
+    };
 }
