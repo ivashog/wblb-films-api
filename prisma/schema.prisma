@@ -1,11 +1,52 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model actors {
+  id          Int           @default(autoincrement()) @id
+  full_name   String        @unique
+  films_count Int           @default(1)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @default(now())
+  film_actors film_actors[]
+}
+
+model film_actors {
+  film_id  Int
+  actor_id Int
+  actors   actors @relation(fields: [actor_id], references: [id])
+  films    films  @relation(fields: [film_id], references: [id])
+
+  @@id([film_id, actor_id])
+}
+
+model films {
+  id           Int           @default(autoincrement()) @id
+  name         String
+  release_year Int
+  format_id    Int?
+  created_at   DateTime      @default(now())
+  formats_dict formats_dict? @relation(fields: [format_id], references: [id])
+  film_actors  film_actors[]
+
+  @@index([name], name: "IDX_FILMS__NAME")
+  @@unique([name, release_year], name: "UQ_FILMS_NAME_RELEASE_YEAR")
+}
+
+model formats_dict {
+  id          Int     @default(autoincrement()) @id
+  name        String
+  description String?
+  films       films[]
+}
+
+model migrations {
+  id        Int    @default(autoincrement()) @id
+  timestamp Int
+  name      String
 }

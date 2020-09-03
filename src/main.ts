@@ -38,7 +38,12 @@ async function bootstrap() {
         .build();
 
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup(apiDocsPath, app, document);
+    SwaggerModule.setup(apiDocsPath, app, document, {
+        customSiteTitle: appName,
+        swaggerOptions: {
+            displayRequestDuration: true,
+        },
+    });
 
     app.enableShutdownHooks();
     // tslint:disable

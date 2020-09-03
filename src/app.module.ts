@@ -9,6 +9,7 @@ import { appConfig, configValidationSchema, databaseConfig, DB_CONFIG_TOKEN } fr
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { FilmsModule } from './films/films.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { FilmsModule } from './films/films.module';
             useFactory: (config: ConfigService) => config.get<TypeOrmModuleOptions>(DB_CONFIG_TOKEN),
             inject: [ConfigService],
         }),
+        PrismaModule,
         FilmsModule,
     ],
     controllers: [AppController],
