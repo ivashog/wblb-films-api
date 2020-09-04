@@ -13,10 +13,8 @@ export class AppController {
 
     @Get('/prisma')
     async helloPrisma() {
-        return this.prisma.formats_dict.findMany({
-            include: {
-                films: true,
-            },
+        return this.prisma.filmFormat.findMany({
+            include: { films: true },
         });
     }
 }
