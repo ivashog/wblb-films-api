@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = "***"
+}
+
+model Actor {
+  id         Int      @id @default(autoincrement())
+  fullName   String   @unique @map("full_name")
+  filmsCount Int      @default(1) @map("films_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  films      Film[]   @relation("_actors_to_films")
+
+  @@map("actors")
+}
+
+model Film {
+  id          Int         @default(autoincrement())@id
+  name        String
+  releaseYear Int         @map("release_year")
+  formatId    Int?        @map("format_id")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  format      FilmFormat? @relation(fields: [formatId], references: [id])
+  actors      Actor[]     @relation("_actors_to_films")
+
+  @@index([name])
+  @@unique([name, releaseYear])
+  @@map("films")
+}
+
+model FilmFormat {
+  id          Int     @default(autoincrement()) @id
+  name        String
+  description String?
+  films       Film[]
+
+  @@map("formats_dict")
+}
