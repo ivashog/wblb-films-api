@@ -24,13 +24,13 @@
     "migration:generate": "npm run typeorm -- migration:generate -n",
     "migrate": "npm run typeorm -- migration:run -t=false",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --class",
     "release": "standard-version",
     "prisma:generate": "npx prisma generate",
     "prisma:generate:watch": "npx prisma generate --watch",
     "prisma:save": "npx prisma migrate save --experimental",
     "prisma:studio": "npx prisma studio --experimental",
-    "prisma:up": "npx prisma migrate up --experimental"
+    "prisma:up": "npx prisma migrate up --experimental",
+    "seed": "ts-node prisma/_seeds/seed.ts"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -69,6 +69,7 @@
     "@types/multer": "^1.4.4",
     "@types/node": "^14.6.3",
     "@types/supertest": "^2.0.10",
+    "@types/yargs": "^15.0.5",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.22.0",
@@ -80,7 +81,8 @@
     "ts-loader": "^6.2.2",
     "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "yargs": "^15.4.1"
   },
   "jest": {
     "moduleFileExtensions": [
