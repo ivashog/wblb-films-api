@@ -1,3 +1,4 @@
 # Prisma Migrate lockfile v1
 
 20200904122300-initial-migration
+20200904125453-fix-actors-to-films-relation-name

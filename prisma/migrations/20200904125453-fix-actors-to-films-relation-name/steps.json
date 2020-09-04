@@ -1,0 +1,33 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Actor",
+          "field": "films"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "newValue": "\"actors_to_films\""
+    },
+    {
+      "tag": "UpdateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Film",
+          "field": "actors"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "newValue": "\"actors_to_films\""
+    }
+  ]
+}
