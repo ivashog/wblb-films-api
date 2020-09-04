@@ -2,3 +2,4 @@
 
 20200904122300-initial-migration
 20200904125453-fix-actors-to-films-relation-name
+20200904151526-add-unique-to-film-format-name
