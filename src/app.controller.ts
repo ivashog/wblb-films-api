@@ -12,7 +12,7 @@ export class AppController {
     }
 
     @Get('/prisma')
-    async helloPrisma() {
+    helloPrisma() {
         return this.prisma.filmFormat.findMany({
             include: { films: true },
         });

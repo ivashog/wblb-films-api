@@ -5,44 +5,80 @@ import { PrismaClient } from '@prisma/client';
 import { appendFileSync, readFileSync } from 'fs';
 import path from 'path';
 
-export type SeederFn<T extends object> = (prisma: PrismaClient) => Promise<(void | T)[]>;
+export type SeederFn<T extends object> = (
+    prisma: PrismaClient,
+    options?: { [x: string]: unknown },
+) => Promise<(void | T)[]>;
 export type Seeders = {
     [seeder: string]: SeederFn<any>;
 };
 
-const argv = yargs.options('environment', {
-    alias: 'env',
-    default: 'development',
-    description: 'Name of environment (must matches with seeds folder)',
+const argv = yargs.options({
+    env: {
+        default: 'development',
+        description: 'Name of environment (must matches with seeds folder)',
+    },
+    verbose: {
+        type: 'boolean',
+        default: false,
+        description: 'Run with verbose logging',
+    },
+    amount: {
+        type: 'number',
+        description: 'Run seed with "amount" option (for generation "amount" seed objects)',
+    },
 }).argv;
 
-const env = argv.environment;
-console.info('--env', env);
+const { _, $0, env, verbose, ...options } = argv;
+if (verbose) {
+    console.info('options:');
+    console.table(options);
+}
 
 const main = async () => {
     const prisma = new PrismaClient();
     const seeders: Seeders = await import(`./${env}`);
 
     await Promise.all(
-        Object.entries(seeders).map(([seederName, seederFn]) => {
-            writeSeedLockfile(seederName);
-            return seederFn(prisma);
+        Object.entries(seeders).map(async ([seederName, seederFn]) => {
+            if (isSeedAlreadyExecuted(seederName, seederFn)) return;
+
+            const result = await seederFn(prisma, options);
+            if (verbose) {
+                console.log(`>> Log result for ${seederName}:`);
+                console.table(result);
+            }
+
+            return result;
         }),
     );
+
     console.log('\n>> DONE!');
 
     await prisma.$disconnect();
 };
 
-const writeSeedLockfile = (seederName: string): void => {
+const isSeedAlreadyExecuted = (seederName: string, seederFn?: SeederFn<any>): boolean => {
     const LOCKFILE_PATH = path.resolve(__dirname, 'seed.lock');
-    const seedLog = `${Date.now()}-${seederName}`;
     const lockfile = readFileSync(LOCKFILE_PATH, { encoding: 'utf-8' });
 
-    if (!lockfile.includes(seederName)) {
+    if (seederFn && seederFn.length > 1) {
+        seederName += `::${parseArgsToStr(options)}`;
+    }
+    const seedLog = `${Date.now()}-${seederName}`;
+    const isSeedAlreadyExecuted = lockfile.includes(seederName);
+
+    if (!isSeedAlreadyExecuted) {
         appendFileSync(LOCKFILE_PATH, '\n' + seedLog);
         console.log('+ ', seedLog);
     }
+
+    return isSeedAlreadyExecuted;
 };
+
+const parseArgsToStr = (args: { [x: string]: unknown }): string =>
+    Object.entries(args)
+        .reduce((acc, [key, value]) => [...acc, `${key}=${value}`], [])
+        .join(',');
 
 main();

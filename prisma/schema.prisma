@@ -19,7 +19,7 @@ model Actor {
 }
 
 model Film {
-  id          Int         @default(autoincrement())@id
+  id          Int         @default(autoincrement()) @id
   name        String
   releaseYear Int         @map("release_year")
   formatId    Int?        @map("format_id")
