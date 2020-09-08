@@ -1,5 +1,5 @@
 export enum FilmFormats {
-    VHS = 1,
-    DVD,
-    'Blu-Ray',
+    VHS = 'VHS',
+    DVD = 'DVD',
+    'Blu-Ray' = 'Blu-Ray',
 }

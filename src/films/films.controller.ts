@@ -17,17 +17,17 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FilmsService } from './films.service';
-import { ImportFilmsDto } from './dto/import-films.dto';
-import { AddFilmDto } from './dto/add-film.dto';
-import { CreatedFilmDto } from './dto/created-film.dto';
-import { FilmResponseDto } from './dto/film-response.dto';
+import { ImportFilmsDto } from './dtos/import-films.dto';
+import { CreateFilmDto } from './dtos/input/create-film.dto';
+import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
+import { FilmResponseDto } from './dtos/output/film-response.dto';
 import { FilmEntity } from '../database/entities/film.entity';
-import { FilmsImportResDto } from './dto/films-import-res.dto';
-import { SearchFilmsDto } from './dto/search-films.dto';
-import { SortingDto } from './dto/sorting.dto';
+import { FilmsImportResDto } from './dtos/films-import-res.dto';
+import { SearchFilmsDto } from './dtos/search-films.dto';
+import { SortingDto } from './dtos/input/sorting.dto';
 
 @Controller('films')
 @ApiTags('Films routes')
@@ -39,6 +39,13 @@ export class FilmsController {
     @ApiOkResponse({ type: FilmResponseDto, isArray: true })
     async getList(@Query() sort: SortingDto) {
         return await this.filmsService.getList(sort.order);
+    }
+
+    @Post()
+    @ApiOperation({ summary: 'Create one film' })
+    @ApiCreatedResponse({ type: CreatedFilmResponseDto })
+    async addFilm(@Body() film: CreateFilmDto) {
+        return this.filmsService.createOne(film);
     }
 
     @Get('/search')
@@ -61,16 +68,6 @@ export class FilmsController {
             throw new NotFoundException(`Film with id ${id} is not founded!`);
         }
         return film;
-    }
-
-    @Post()
-    @ApiOperation({ summary: 'Create one film' })
-    async addFilm(@Body() film: AddFilmDto): Promise<CreatedFilmDto> {
-        const newFilm = await this.filmsService.create(film);
-        if (!newFilm) {
-            throw new ConflictException(`Film with same name and year already exists!`);
-        }
-        return newFilm;
     }
 
     @Delete(':id')

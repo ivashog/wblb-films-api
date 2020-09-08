@@ -3,18 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { plainToClass, TransformClassToClass, TransformPlainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { SortOrder } from '@prisma/client';
+import { PrismaClientKnownRequestError, SortOrder } from '@prisma/client';
 
 import { FilmEntity } from '../database/entities/film.entity';
-import { RawFilm, RawFilmDto } from './dto/raw-film.dto';
-import { AddFilmDto } from './dto/add-film.dto';
+import { RawFilm, RawFilmDto } from './dtos/raw-film.dto';
+import { CreateFilmDto } from './dtos/input/create-film.dto';
 import { ActorEntity } from '../database/entities/actor.entity';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
-import { CreatedFilmDto } from './dto/created-film.dto';
-import { FilmsImportResDto } from './dto/films-import-res.dto';
-import { SearchFilmsDto } from './dto/search-films.dto';
+import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
+import { FilmsImportResDto } from './dtos/films-import-res.dto';
+import { SearchFilmsDto } from './dtos/search-films.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { FilmResponseDto } from './dto/film-response.dto';
+import { FilmResponseDto } from './dtos/output/film-response.dto';
+import { PrismaErrorCodesEnum } from '../prisma/prisma-error-codes.enum';
+import { EnumValues } from 'enum-values';
 
 @Injectable()
 export class FilmsService {
@@ -28,8 +30,8 @@ export class FilmsService {
     ) {}
 
     @TransformPlainToClass(FilmResponseDto)
-    async getList(order: SortOrder) {
-        return await this.prisma.film.findMany({
+    getList(order: SortOrder) {
+        return this.prisma.film.findMany({
             select: {
                 id: true,
                 name: true,
@@ -38,6 +40,16 @@ export class FilmsService {
                 actors: { select: { fullName: true } },
             },
             orderBy: { name: order },
+        });
+    }
+
+    @TransformPlainToClass(CreatedFilmResponseDto)
+    createOne(createFilmDto: CreateFilmDto) {
+        const { formatName, actorsList, ...filmData } = createFilmDto;
+
+        return this.prisma.film.create({
+            select: { id: true, name: true, actors: true },
+            data: filmData,
         });
     }
 
@@ -62,54 +74,54 @@ export class FilmsService {
         return await qb.getMany();
     }
 
-    async create(filmDto: AddFilmDto): Promise<CreatedFilmDto> {
-        const { actors, ...film } = filmDto;
-        const actorsEntities = actors
-            .split(',')
-            .filter(a => a.trim())
-            .map(actorName =>
-                plainToClass(ActorEntity, {
-                    fullName: actorName.trim(),
-                }),
-            );
-
-        return await this.connection.transaction(async manager => {
-            try {
-                const newFilm = await manager.save(plainToClass(FilmEntity, film));
-
-                const { generatedMaps: createdActors } = await manager
-                    .createQueryBuilder()
-                    .insert()
-                    .into(ActorEntity)
-                    .values(actorsEntities)
-                    .onConflict(
-                        `
-                    (full_name) DO UPDATE
-                    SET films_count = actors.films_count + 1,
-                        created_at  = actors.created_at,
-                        updated_at  = EXCLUDED.updated_at`,
-                    )
-                    .returning('*')
-                    .execute();
-
-                const filmActorsEntities = createdActors.map(newActor =>
-                    plainToClass(FilmActorEntity, {
-                        film: newFilm.id,
-                        actor: newActor,
-                    }),
-                );
-                await manager.save(filmActorsEntities);
-
-                return {
-                    id: newFilm.id,
-                    name: newFilm.name,
-                };
-            } catch (e) {
-                Logger.error('Error in film creation transaction: ' + e.message);
-                return null;
-            }
-        });
-    }
+    // async create(filmDto: CreateFilmDto): Promise<CreatedFilmResponseDto> {
+    //     const { actorsList, ...film } = filmDto;
+    //     const actorsEntities = actorsList
+    //         .split(',')
+    //         .filter(a => a.trim())
+    //         .map(actorName =>
+    //             plainToClass(ActorEntity, {
+    //                 fullName: actorName.trim(),
+    //             }),
+    //         );
+    //
+    //     return await this.connection.transaction(async manager => {
+    //         try {
+    //             const newFilm = await manager.save(plainToClass(FilmEntity, film));
+    //
+    //             const { generatedMaps: createdActors } = await manager
+    //                 .createQueryBuilder()
+    //                 .insert()
+    //                 .into(ActorEntity)
+    //                 .values(actorsEntities)
+    //                 .onConflict(
+    //                     `
+    //                 (full_name) DO UPDATE
+    //                 SET films_count = actors.films_count + 1,
+    //                     created_at  = actors.created_at,
+    //                     updated_at  = EXCLUDED.updated_at`,
+    //                 )
+    //                 .returning('*')
+    //                 .execute();
+    //
+    //             const filmActorsEntities = createdActors.map(newActor =>
+    //                 plainToClass(FilmActorEntity, {
+    //                     film: newFilm.id,
+    //                     actor: newActor,
+    //                 }),
+    //             );
+    //             await manager.save(filmActorsEntities);
+    //
+    //             return {
+    //                 id: newFilm.id,
+    //                 name: newFilm.name,
+    //             };
+    //         } catch (e) {
+    //             Logger.error('Error in film creation transaction: ' + e.message);
+    //             return null;
+    //         }
+    //     });
+    // }
 
     async delete(id: number) {
         return await this.filmRepository.delete(id);
@@ -119,14 +131,14 @@ export class FilmsService {
         const response = new FilmsImportResDto();
 
         for await (const rawFilm of rawFilmsData) {
-            const filmDto = plainToClass(AddFilmDto, rawFilm);
+            const filmDto = plainToClass(CreateFilmDto, rawFilm);
             const errors = await validate(filmDto);
             if (errors.length) {
                 response.errors.push({ value: rawFilm, error: errors });
                 continue;
             }
 
-            const newFilm = await this.create(filmDto);
+            const newFilm = await this.createOne(filmDto);
             if (!newFilm) {
                 response.errors.push({
                     value: filmDto,
