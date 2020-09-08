@@ -6,10 +6,11 @@ import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { appConfig, configValidationSchema, databaseConfig, DB_CONFIG_TOKEN } from './config';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { FilmsModule } from './films/films.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PrismaExceptionFilter } from './prisma/prisma-exception.filter';
 
 @Module({
     imports: [
@@ -43,6 +44,10 @@ import { PrismaModule } from './prisma/prisma.module';
         {
             provide: APP_INTERCEPTOR,
             useClass: LoggingInterceptor,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: PrismaExceptionFilter,
         },
     ],
 })
