@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import { plainToClass, TransformClassToClass } from 'class-transformer';
+import { plainToClass, TransformClassToClass, TransformPlainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import { SortOrder } from '@prisma/client';
 
 import { FilmEntity } from '../database/entities/film.entity';
 import { RawFilm, RawFilmDto } from './dto/raw-film.dto';
@@ -12,7 +13,8 @@ import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmDto } from './dto/created-film.dto';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 import { SearchFilmsDto } from './dto/search-films.dto';
-import { SortOrder } from './dto/sorting.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { FilmResponseDto } from './dto/film-response.dto';
 
 @Injectable()
 export class FilmsService {
@@ -22,11 +24,20 @@ export class FilmsService {
         private readonly filmRepository: Repository<FilmEntity>,
         @InjectRepository(ActorEntity)
         private readonly actorRepository: Repository<ActorEntity>,
+        private readonly prisma: PrismaService,
     ) {}
 
-    async findAll(order: SortOrder): Promise<FilmEntity[]> {
-        return await this.filmRepository.find({
-            order: { name: order },
+    @TransformPlainToClass(FilmResponseDto)
+    async getList(order: SortOrder) {
+        return await this.prisma.film.findMany({
+            select: {
+                id: true,
+                name: true,
+                releaseYear: true,
+                format: { select: { name: true } },
+                actors: { select: { fullName: true } },
+            },
+            orderBy: { name: order },
         });
     }
 

@@ -1,14 +1,13 @@
 import { IsIn, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
-export type SortOrder = 'ASC' | 'DESC';
+import { SortOrder } from '@prisma/client';
 
 export class SortingDto {
     @ApiProperty()
     @IsOptional()
-    @IsIn(['ASC', 'DESC'])
+    @IsIn(Object.values(SortOrder))
     @IsString()
-    @Transform(value => value.toUpperCase())
-    order?: SortOrder = 'ASC';
+    @Transform((value: string) => value.toLowerCase())
+    order?: SortOrder = SortOrder.asc;
 }

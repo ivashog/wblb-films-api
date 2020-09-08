@@ -23,7 +23,7 @@ import { FilmsService } from './films.service';
 import { ImportFilmsDto } from './dto/import-films.dto';
 import { AddFilmDto } from './dto/add-film.dto';
 import { CreatedFilmDto } from './dto/created-film.dto';
-import { FilmPlainResDto } from './dto/film-plain-res.dto';
+import { FilmResponseDto } from './dto/film-response.dto';
 import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dto/films-import-res.dto';
 import { SearchFilmsDto } from './dto/search-films.dto';
@@ -35,17 +35,16 @@ export class FilmsController {
     constructor(private readonly filmsService: FilmsService) {}
 
     @Get()
-    @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Get list of films ordered by name' })
-    @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
-    async getList(@Query() sort: SortingDto): Promise<FilmEntity[]> {
-        return await this.filmsService.findAll(sort.order);
+    @ApiOkResponse({ type: FilmResponseDto, isArray: true })
+    async getList(@Query() sort: SortingDto) {
+        return await this.filmsService.getList(sort.order);
     }
 
     @Get('/search')
     @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Search films by name or actor' })
-    @ApiOkResponse({ type: FilmPlainResDto, isArray: true })
+    @ApiOkResponse({ type: FilmResponseDto, isArray: true })
     async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
         if ((!name && !actor) || (name && actor)) {

@@ -1,4 +1,4 @@
-import { PrismaClient, Film, FilmCreateInput, Actor, ActorCreateInput } from '@prisma/client';
+import { PrismaClient, FilmCreateInput, ActorCreateInput } from '@prisma/client';
 import { SeederFn } from '../seed';
 import faker from 'faker/locale/uk';
 
