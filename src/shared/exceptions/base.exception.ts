@@ -5,8 +5,8 @@ export class BaseException extends HttpException {
         super(response, status);
     }
 
-    static parseWhereParams = (paramsObj: object): string =>
-        Object.entries(paramsObj)
-            .reduce((acc, [key, value]) => [...acc, `${key}=${value}`], [])
+    static parseParamsObj = (params: object): string =>
+        Object.entries(params)
+            .reduce((acc, [key, value]) => [...acc, `'${key}'='${value}'`], [])
             .join(',');
 }

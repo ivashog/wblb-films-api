@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ValidationError } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { plainToClass, TransformClassToClass, TransformPlainToClass } from 'class-transformer';
@@ -12,13 +12,15 @@ import { ActorEntity } from '../database/entities/actor.entity';
 import { FilmActorEntity } from '../database/entities/film-actor.entity';
 import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
 import { FilmsImportResDto } from './dtos/films-import-res.dto';
-import { SearchFilmsDto } from './dtos/search-films.dto';
+import { SearchFilmsDto } from './dtos/input/search-films.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { FilmResponseDto } from './dtos/output/film-response.dto';
 import { PrismaErrorCodesEnum } from '../prisma/prisma-error-codes.enum';
 import { EnumValues } from 'enum-values';
 import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
 import { FilmNotFoundException } from './exceptions/film-not-found.exception';
+import { CreateFilmConflictException } from './exceptions/create-film-conflict.exception';
+import { flattenValidationErrors } from '../shared/exceptions/exception.factory';
 
 @Injectable()
 export class FilmsService {
@@ -46,13 +48,21 @@ export class FilmsService {
     }
 
     @TransformPlainToClass(CreatedFilmResponseDto)
-    createOne(createFilmDto: CreateFilmDto) {
+    async createOne(createFilmDto: CreateFilmDto) {
         const { formatName, actorsList, ...filmData } = createFilmDto;
 
-        return this.prisma.film.create({
-            select: { id: true, name: true, actors: true },
-            data: filmData,
-        });
+        try {
+            return await this.prisma.film.create({
+                select: { id: true, name: true, actors: true },
+                data: filmData,
+            });
+        } catch (err) {
+            if (err.code === PrismaErrorCodesEnum.UniqueKeyViolation) {
+                const { name, releaseYear } = filmData;
+                throw new CreateFilmConflictException({ name, releaseYear });
+            }
+            throw err;
+        }
     }
 
     @TransformPlainToClass(FilmDetailResponseDto)
@@ -110,21 +120,28 @@ export class FilmsService {
         for await (const rawFilm of rawFilmsData) {
             const filmDto = plainToClass(CreateFilmDto, rawFilm);
             const errors = await validate(filmDto);
-            if (errors.length) {
-                response.errors.push({ value: rawFilm, error: errors });
-                continue;
-            }
-
-            const newFilm = await this.createOne(filmDto);
-            if (!newFilm) {
+            if (errors.length > 0) {
                 response.errors.push({
-                    value: filmDto,
-                    error: 'Film with same name and year already exists!',
+                    value: rawFilm,
+                    error: flattenValidationErrors(errors as ValidationError[]),
                 });
                 continue;
             }
 
-            response.data.push(newFilm);
+            const { formatName, actorsList, ...filmData } = filmDto;
+            const upsertedFilm = await this.prisma.film.upsert({
+                select: { id: true, name: true, actors: true },
+                where: {
+                    name_releaseYear: {
+                        name: filmData.name,
+                        releaseYear: filmData.releaseYear,
+                    },
+                },
+                create: filmData,
+                update: filmData,
+            });
+
+            response.data.push(plainToClass(CreatedFilmResponseDto, upsertedFilm));
         }
 
         return response;
@@ -136,8 +153,8 @@ export class FilmsService {
         const FILM_PARSER_SCHEMA: RawFilm = {
             name: 'Title',
             releaseYear: 'Release Year',
-            format: 'Format',
-            actors: 'Stars',
+            formatName: 'Format',
+            actorsList: 'Stars',
         };
         const txtData: string = file.toString('utf8');
         const filmsRawItems: string[] = txtData.split(ROWS_SEPARATOR.repeat(2)).filter(i => i);

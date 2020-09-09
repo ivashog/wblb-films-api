@@ -1,10 +1,10 @@
-import { FilmEntity } from '../../database/entities/film.entity';
+import { CreateFilmDto } from './input/create-film.dto';
 
-export type RawFilm = { [P in keyof FilmEntity]?: string };
+export type RawFilm = Record<keyof Omit<CreateFilmDto, 'format' | 'actors'>, string>;
 
 export class RawFilmDto implements RawFilm {
     name: string = null;
     releaseYear: string = null;
-    format: string = null;
-    actors: string = null;
+    formatName: string = null;
+    actorsList: string = null;
 }

@@ -5,7 +5,7 @@ import { BaseException } from '../../shared/exceptions/base.exception';
 
 export class FilmNotFoundException extends BaseException {
     constructor(whereExpression: FilmWhereUniqueInput) {
-        const paramsStr = BaseException.parseWhereParams(whereExpression);
+        const paramsStr = BaseException.parseParamsObj(whereExpression);
         const statusCode = HttpStatus.NOT_FOUND;
 
         super(

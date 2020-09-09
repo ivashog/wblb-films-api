@@ -1,24 +1,21 @@
 import {
-    Get,
-    Post,
-    Delete,
     Body,
-    Param,
-    Query,
-    HttpStatus,
-    HttpCode,
-    UploadedFile,
     Controller,
-    UseInterceptors,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
     ParseIntPipe,
-    ClassSerializerInterceptor,
-    ConflictException,
-    BadRequestException,
-    NotFoundException,
+    Post,
+    Query,
+    UploadedFile,
+    UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
     ApiBody,
+    ApiConflictResponse,
     ApiConsumes,
     ApiCreatedResponse,
     ApiOkResponse,
@@ -27,13 +24,12 @@ import {
 } from '@nestjs/swagger';
 
 import { FilmsService } from './films.service';
-import { ImportFilmsDto } from './dtos/import-films.dto';
+import { ImportFilmsDto } from './dtos/input/import-films.dto';
 import { CreateFilmDto } from './dtos/input/create-film.dto';
 import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
 import { FilmResponseDto } from './dtos/output/film-response.dto';
-import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dtos/films-import-res.dto';
-import { SearchFilmsDto } from './dtos/search-films.dto';
+import { SearchFilmsDto } from './dtos/input/search-films.dto';
 import { SortingDto } from './dtos/input/sorting.dto';
 import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
 
@@ -52,6 +48,7 @@ export class FilmsController {
     @Post()
     @ApiOperation({ summary: 'Create one film' })
     @ApiCreatedResponse({ type: CreatedFilmResponseDto })
+    @ApiConflictResponse()
     addFilm(@Body() film: CreateFilmDto) {
         return this.filmsService.createOne(film);
     }
@@ -79,13 +76,14 @@ export class FilmsController {
 
     @Post('import')
     @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1024 * 1024 } }))
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Import films from *.txt file' })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         description: 'List of films in txt format',
         type: ImportFilmsDto,
     })
-    async import(@UploadedFile() file: Express.Multer.File): Promise<FilmsImportResDto> {
+    async import(@UploadedFile() file: Express.Multer.File) {
         const rawFilmData = this.filmsService.parseTxt(file.buffer);
         return await this.filmsService.batchCreate(rawFilmData);
     }
