@@ -45,29 +45,28 @@ export class FilmsController {
     @Get()
     @ApiOperation({ summary: 'Get list of films ordered by name' })
     @ApiOkResponse({ type: FilmResponseDto, isArray: true })
-    async getList(@Query() sort: SortingDto) {
-        return await this.filmsService.getList(sort.order);
+    getList(@Query() sort: SortingDto) {
+        return this.filmsService.getList(sort.order);
     }
 
     @Post()
     @ApiOperation({ summary: 'Create one film' })
     @ApiCreatedResponse({ type: CreatedFilmResponseDto })
-    async addFilm(@Body() film: CreateFilmDto) {
+    addFilm(@Body() film: CreateFilmDto) {
         return this.filmsService.createOne(film);
     }
 
     @Get('/search')
-    @UseInterceptors(ClassSerializerInterceptor)
     @ApiOperation({ summary: 'Search films by name or actor' })
     @ApiOkResponse({ type: FilmResponseDto, isArray: true })
-    async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
+    async search(@Query() searchDto: SearchFilmsDto) {
         const { name, actor } = searchDto;
         if ((!name && !actor) || (name && actor)) {
             throw new BadRequestException(
                 `One of ['name', 'actor'] query params must be specified`,
             );
         }
-        return await this.filmsService.find(searchDto);
+        return this.filmsService.search(searchDto);
     }
 
     @Get('/:id')

@@ -69,20 +69,23 @@ export class FilmsService {
         });
     }
 
-    async find(searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
-        const { name, actor } = searchDto;
-
-        let qb = this.filmRepository
-            .createQueryBuilder('film')
-            .leftJoinAndSelect('film.actors', 'filmAct')
-            .leftJoinAndSelect('filmAct.actor', 'actor')
-            .orderBy('film.name', 'ASC')
-            .addOrderBy('film.releaseYear', 'DESC');
-
-        if (name) qb = qb.where(`film.name ILIKE '%${name}%'`);
-        if (actor) qb = qb.where(`actor.fullName ILIKE '%${actor}%'`);
-
-        return await qb.getMany();
+    @TransformPlainToClass(FilmResponseDto)
+    async search(searchFilmDto: SearchFilmsDto) {
+        const { name, actor } = searchFilmDto;
+        return this.prisma.film.findMany({
+            select: {
+                id: true,
+                name: true,
+                releaseYear: true,
+                format: { select: { name: true } },
+                actors: { select: { fullName: true } },
+            },
+            where: {
+                name: { contains: name, mode: 'insensitive' },
+                actors: { some: { fullName: { contains: actor, mode: 'insensitive' } } },
+            },
+            orderBy: [{ releaseYear: SortOrder.desc }, { name: SortOrder.asc }],
+        });
     }
 
     async delete(id: number) {
