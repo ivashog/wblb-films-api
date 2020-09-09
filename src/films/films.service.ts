@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { plainToClass, TransformClassToClass, TransformPlainToClass } from 'class-transformer';
@@ -18,6 +18,7 @@ import { FilmResponseDto } from './dtos/output/film-response.dto';
 import { PrismaErrorCodesEnum } from '../prisma/prisma-error-codes.enum';
 import { EnumValues } from 'enum-values';
 import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
+import { FilmNotFoundException } from './exceptions/film-not-found.exception';
 
 @Injectable()
 export class FilmsService {
@@ -55,8 +56,8 @@ export class FilmsService {
     }
 
     @TransformPlainToClass(FilmDetailResponseDto)
-    getById(id: number) {
-        return this.prisma.film.findOne({
+    async getById(id: number) {
+        const film = await this.prisma.film.findOne({
             select: {
                 id: true,
                 name: true,
@@ -67,6 +68,10 @@ export class FilmsService {
             },
             where: { id },
         });
+
+        if (!film) throw new FilmNotFoundException({ id });
+
+        return film;
     }
 
     @TransformPlainToClass(FilmResponseDto)
@@ -89,7 +94,14 @@ export class FilmsService {
     }
 
     async delete(id: number) {
-        return await this.filmRepository.delete(id);
+        const existFilm = await this.prisma.film.findOne({
+            select: { id: true },
+            where: { id },
+        });
+
+        if (!existFilm) throw new FilmNotFoundException({ id });
+
+        return this.prisma.film.delete({ select: null, where: { id: existFilm.id } });
     }
 
     async batchCreate(rawFilmsData: RawFilmDto[]): Promise<FilmsImportResDto> {

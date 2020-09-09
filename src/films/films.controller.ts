@@ -59,36 +59,22 @@ export class FilmsController {
     @Get('/search')
     @ApiOperation({ summary: 'Search films by name or actor' })
     @ApiOkResponse({ type: FilmResponseDto, isArray: true })
-    async search(@Query() searchDto: SearchFilmsDto) {
-        const { name, actor } = searchDto;
-        if ((!name && !actor) || (name && actor)) {
-            throw new BadRequestException(
-                `One of ['name', 'actor'] query params must be specified`,
-            );
-        }
+    search(@Query() searchDto: SearchFilmsDto) {
         return this.filmsService.search(searchDto);
     }
 
     @Get('/:id')
     @ApiOperation({ summary: 'Get film detail info by id' })
     @ApiOkResponse({ type: FilmDetailResponseDto })
-    async getOneDetails(@Param('id', ParseIntPipe) id: number) {
-        const film = await this.filmsService.getById(id);
-        if (!film) {
-            throw new NotFoundException(`Film with id ${id} is not founded!`);
-        }
-        return film;
+    getOneDetails(@Param('id', ParseIntPipe) id: number) {
+        return this.filmsService.getById(id);
     }
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete film by id' })
-    async dropFilm(@Param('id', ParseIntPipe) id: number) {
-        const film = await this.filmsService.getById(id);
-        if (!film) {
-            throw new NotFoundException(`Film with id ${id} is not founded!`);
-        }
-        await this.filmsService.delete(id);
+    dropFilm(@Param('id', ParseIntPipe) id: number) {
+        return this.filmsService.delete(id);
     }
 
     @Post('import')
