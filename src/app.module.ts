@@ -16,7 +16,10 @@ import { PrismaExceptionFilter } from './prisma/prisma-exception.filter';
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: path.resolve(process.cwd(), `${process.env.NODE_ENV || 'development'}.env`),
+            envFilePath: path.resolve(
+                process.cwd(),
+                `${process.env.NODE_ENV || 'development'}.env`,
+            ),
             ignoreEnvFile: process.env.NODE_ENV === 'production', // it is used for heroku production deploy
             validationSchema: configValidationSchema,
             validationOptions: {
@@ -26,7 +29,8 @@ import { PrismaExceptionFilter } from './prisma/prisma-exception.filter';
             load: [appConfig, databaseConfig],
         }),
         TypeOrmModule.forRootAsync({
-            useFactory: (config: ConfigService) => config.get<TypeOrmModuleOptions>(DB_CONFIG_TOKEN),
+            useFactory: (config: ConfigService) =>
+                config.get<TypeOrmModuleOptions>(DB_CONFIG_TOKEN),
             inject: [ConfigService],
         }),
         PrismaModule,

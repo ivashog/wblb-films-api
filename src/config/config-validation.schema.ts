@@ -34,7 +34,11 @@ export const configValidationSchema = Joi.object({
     TYPEORM_SCHEMA: Joi.string().default('public'),
     TYPEORM_SYNCHRONIZE: Joi.boolean().default(false),
     TYPEORM_LOGGING: Joi.alternatives()
-        .try(Joi.boolean(), Joi.string().valid('all'), Joi.string().valid(...availableTypeormLoggerOptions))
+        .try(
+            Joi.boolean(),
+            Joi.string().valid('all'),
+            Joi.string().valid(...availableTypeormLoggerOptions),
+        )
         .default('all'),
     TYPEORM_ENTITIES: Joi.string()
         .uri({ relativeOnly: true })

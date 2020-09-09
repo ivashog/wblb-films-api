@@ -10,4 +10,12 @@ export const zeitMsRegexp = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|secon
  * @see https://github.com/typeorm/typeorm/blob/90b406581d55223afa4472eb812d7f9ed2dce73c/src/logger/LoggerOptions.ts#L4
  * @type {("query" | "schema" | "error" | "warn" | "info" | "log" | "migration")[]}
  */
-export const availableTypeormLoggerOptions: string[] = ['query', 'schema', 'error', 'warn', 'info', 'log', 'migration'];
+export const availableTypeormLoggerOptions: string[] = [
+    'query',
+    'schema',
+    'error',
+    'warn',
+    'info',
+    'log',
+    'migration',
+];

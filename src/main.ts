@@ -12,9 +12,9 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const config: ConfigService = app.get(ConfigService);
-    const { port, host, appName, version, description, isProduction, apiDocsPath } = config.get<AppConfig>(
-        APP_CONFIG_TOKEN,
-    );
+    const { port, host, appName, version, description, isProduction, apiDocsPath } = config.get<
+        AppConfig
+    >(APP_CONFIG_TOKEN);
 
     app.enableCors();
 

@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
 
 import { FormatDictEntity } from './format-dict.entity';
 import { FilmActorEntity } from './film-actor.entity';
@@ -22,7 +31,9 @@ export class FilmEntity {
     format: FormatDictEntity;
 
     @Transform(actors => actors.map(item => item.actor), { toClassOnly: true })
-    @Transform(actors => actors.map(item => item.actor.fullName), { toPlainOnly: true })
+    @Transform(actors => actors.map(item => item.actor.fullName), {
+        toPlainOnly: true,
+    })
     @OneToMany(
         type => FilmActorEntity,
         actor => actor.film,

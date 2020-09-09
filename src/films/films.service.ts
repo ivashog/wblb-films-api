@@ -130,9 +130,9 @@ export class FilmsService {
         return filmsRawItems.map(rawFilm =>
             rawFilm.split(ROWS_SEPARATOR).reduce((filmObj: RawFilmDto, filmAttr) => {
                 const [parseKey, parseValue = ''] = filmAttr.split(ATTR_SEPARATOR);
-                const [objKey] = Object.entries(FILM_PARSER_SCHEMA).find(([, rawKey]) => rawKey === parseKey) || [
-                    parseKey,
-                ];
+                const [objKey] = Object.entries(FILM_PARSER_SCHEMA).find(
+                    ([, rawKey]) => rawKey === parseKey,
+                ) || [parseKey];
                 if (!objKey) return filmObj;
                 return { ...filmObj, [objKey]: parseValue.trim() };
             }, new RawFilmDto()),

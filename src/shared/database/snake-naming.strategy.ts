@@ -7,7 +7,10 @@ export class SnakeNamingStrategy extends DefaultNamingStrategy implements Naming
     }
 
     columnName(propertyName: string, customName: string, embeddedPrefixes: string[]): string {
-        return snakeCase(embeddedPrefixes.join('_')) + (customName ? customName : snakeCase(propertyName));
+        return (
+            snakeCase(embeddedPrefixes.join('_')) +
+            (customName ? customName : snakeCase(propertyName))
+        );
     }
 
     relationName(propertyName: string): string {
@@ -38,7 +41,9 @@ export class SnakeNamingStrategy extends DefaultNamingStrategy implements Naming
         const replacedTableName = this.replaceTableName(tableName);
         const referencedTableName = this.replaceTableName(referencedTablePath);
         const tableKey = `${replacedTableName}__${clonedColumnNames.join('_')}`;
-        const referencedTableKey = `${referencedTableName}__${clonedReferencedColumnNames.join('_')}`;
+        const referencedTableKey = `${referencedTableName}__${clonedReferencedColumnNames.join(
+            '_',
+        )}`;
         const key = `${tableKey}__${referencedTableKey}`;
         return 'FK_' + key.toUpperCase();
     }
@@ -57,7 +62,11 @@ export class SnakeNamingStrategy extends DefaultNamingStrategy implements Naming
         return 'IDX_' + key.toUpperCase();
     }
 
-    relationConstraintName(tableOrName: Table | string, columnNames: string[], where?: string): string {
+    relationConstraintName(
+        tableOrName: Table | string,
+        columnNames: string[],
+        where?: string,
+    ): string {
         // sort incoming column names to avoid issue when ["id", "name"] and ["name", "id"] arrays
         const clonedColumnNames = [...columnNames];
         clonedColumnNames.sort();
@@ -98,14 +107,19 @@ export class SnakeNamingStrategy extends DefaultNamingStrategy implements Naming
         firstPropertyName: string,
         secondPropertyName: string,
     ): string {
-        return snakeCase(firstTableName + '_' + firstPropertyName.replace(/\./gi, '_') + '_' + secondTableName);
+        return snakeCase(
+            firstTableName + '_' + firstPropertyName.replace(/\./gi, '_') + '_' + secondTableName,
+        );
     }
 
     joinTableColumnName(tableName: string, propertyName: string, columnName?: string): string {
         return snakeCase(tableName + '_' + (columnName ? columnName : propertyName));
     }
 
-    classTableInheritanceParentColumnName(parentTableName: any, parentTableIdPropertyName: any): string {
+    classTableInheritanceParentColumnName(
+        parentTableName: any,
+        parentTableIdPropertyName: any,
+    ): string {
         return snakeCase(parentTableName + '_' + parentTableIdPropertyName);
     }
 

@@ -8,14 +8,20 @@ export class FilmActorEntity {
     @ManyToOne(
         type => FilmEntity,
         film => film.actors,
-        { primary: true, onDelete: 'CASCADE' },
+        {
+            primary: true,
+            onDelete: 'CASCADE',
+        },
     )
     film: FilmEntity;
 
     @ManyToOne(
         type => ActorEntity,
         actor => actor.films,
-        { primary: true, eager: true },
+        {
+            primary: true,
+            eager: true,
+        },
     )
     actor: ActorEntity;
 }

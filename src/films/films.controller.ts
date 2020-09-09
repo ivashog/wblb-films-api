@@ -17,7 +17,14 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiConsumes,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+} from '@nestjs/swagger';
 
 import { FilmsService } from './films.service';
 import { ImportFilmsDto } from './dtos/import-films.dto';
@@ -56,7 +63,9 @@ export class FilmsController {
     async search(@Query() searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
         const { name, actor } = searchDto;
         if ((!name && !actor) || (name && actor)) {
-            throw new BadRequestException(`One of ['name', 'actor'] query params must be specified`);
+            throw new BadRequestException(
+                `One of ['name', 'actor'] query params must be specified`,
+            );
         }
         return await this.filmsService.find(searchDto);
     }

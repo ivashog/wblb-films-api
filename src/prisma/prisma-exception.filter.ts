@@ -26,7 +26,8 @@ export class PrismaExceptionFilter extends BaseExceptionFilter {
         }
     }
 
-    protected isPrismaException = (err: unknown): err is PrismaError => err instanceof PrismaClientKnownRequestError;
+    protected isPrismaException = (err: unknown): err is PrismaError =>
+        err instanceof PrismaClientKnownRequestError;
 
     protected parsePrismaError = (error: PrismaError): HttpException => {
         const exceptionArguments = [
