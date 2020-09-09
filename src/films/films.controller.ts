@@ -18,6 +18,7 @@ import {
     ApiConflictResponse,
     ApiConsumes,
     ApiCreatedResponse,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -28,7 +29,6 @@ import { ImportFilmsDto } from './dtos/input/import-films.dto';
 import { CreateFilmDto } from './dtos/input/create-film.dto';
 import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
 import { FilmResponseDto } from './dtos/output/film-response.dto';
-import { FilmsImportResDto } from './dtos/films-import-res.dto';
 import { SearchFilmsDto } from './dtos/input/search-films.dto';
 import { SortingDto } from './dtos/input/sorting.dto';
 import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
@@ -48,7 +48,9 @@ export class FilmsController {
     @Post()
     @ApiOperation({ summary: 'Create one film' })
     @ApiCreatedResponse({ type: CreatedFilmResponseDto })
-    @ApiConflictResponse()
+    @ApiConflictResponse({
+        description: 'Film with the same "name" and "releaseYear" already exists',
+    })
     addFilm(@Body() film: CreateFilmDto) {
         return this.filmsService.createOne(film);
     }
@@ -63,6 +65,7 @@ export class FilmsController {
     @Get('/:id')
     @ApiOperation({ summary: 'Get film detail info by id' })
     @ApiOkResponse({ type: FilmDetailResponseDto })
+    @ApiNotFoundResponse({ description: 'Film with this "id" is not founded' })
     getOneDetails(@Param('id', ParseIntPipe) id: number) {
         return this.filmsService.getById(id);
     }
@@ -70,6 +73,7 @@ export class FilmsController {
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete film by id' })
+    @ApiNotFoundResponse({ description: 'Film with this "id" is not founded' })
     dropFilm(@Param('id', ParseIntPipe) id: number) {
         return this.filmsService.delete(id);
     }

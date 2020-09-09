@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { CreatedFilmResponseDto } from './output/created-film-response.dto';
+import { CreatedFilmResponseDto } from './created-film-response.dto';
 import { ImportFilmErrorDto } from './import-film-error.dto';
 
-export class FilmsImportResDto {
+export class FilmsImportResponseDto {
     @ApiProperty({ type: CreatedFilmResponseDto, isArray: true })
     data: CreatedFilmResponseDto[] = [];
 

@@ -1,4 +1,4 @@
-import { RawFilmDto } from './raw-film.dto';
+import { RawFilmDto } from '../input/raw-film.dto';
 
 export class ImportFilmErrorDto {
     value: RawFilmDto;

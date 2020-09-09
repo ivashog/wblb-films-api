@@ -1,37 +1,25 @@
-import { Injectable, Logger, NotFoundException, ValidationError } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
-import { plainToClass, TransformClassToClass, TransformPlainToClass } from 'class-transformer';
+import { Injectable, ValidationError } from '@nestjs/common';
+import { plainToClass, TransformPlainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { PrismaClientKnownRequestError, SortOrder } from '@prisma/client';
+import { SortOrder } from '@prisma/client';
 
-import { FilmEntity } from '../database/entities/film.entity';
-import { RawFilm, RawFilmDto } from './dtos/raw-film.dto';
-import { CreateFilmDto } from './dtos/input/create-film.dto';
-import { ActorEntity } from '../database/entities/actor.entity';
-import { FilmActorEntity } from '../database/entities/film-actor.entity';
-import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
-import { FilmsImportResDto } from './dtos/films-import-res.dto';
-import { SearchFilmsDto } from './dtos/input/search-films.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { FilmResponseDto } from './dtos/output/film-response.dto';
 import { PrismaErrorCodesEnum } from '../prisma/prisma-error-codes.enum';
-import { EnumValues } from 'enum-values';
-import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
 import { FilmNotFoundException } from './exceptions/film-not-found.exception';
 import { CreateFilmConflictException } from './exceptions/create-film-conflict.exception';
 import { flattenValidationErrors } from '../shared/exceptions/exception.factory';
 
+import { RawFilm, RawFilmDto } from './dtos/input/raw-film.dto';
+import { CreateFilmDto } from './dtos/input/create-film.dto';
+import { CreatedFilmResponseDto } from './dtos/output/created-film-response.dto';
+import { FilmsImportResponseDto } from './dtos/output/films-import-response.dto';
+import { SearchFilmsDto } from './dtos/input/search-films.dto';
+import { FilmResponseDto } from './dtos/output/film-response.dto';
+import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
+
 @Injectable()
 export class FilmsService {
-    constructor(
-        private readonly connection: Connection,
-        @InjectRepository(FilmEntity)
-        private readonly filmRepository: Repository<FilmEntity>,
-        @InjectRepository(ActorEntity)
-        private readonly actorRepository: Repository<ActorEntity>,
-        private readonly prisma: PrismaService,
-    ) {}
+    constructor(private readonly prisma: PrismaService) {}
 
     @TransformPlainToClass(FilmResponseDto)
     getList(order: SortOrder) {
@@ -114,8 +102,8 @@ export class FilmsService {
         return this.prisma.film.delete({ select: null, where: { id: existFilm.id } });
     }
 
-    async batchCreate(rawFilmsData: RawFilmDto[]): Promise<FilmsImportResDto> {
-        const response = new FilmsImportResDto();
+    async batchCreate(rawFilmsData: RawFilmDto[]): Promise<FilmsImportResponseDto> {
+        const response = new FilmsImportResponseDto();
 
         for await (const rawFilm of rawFilmsData) {
             const filmDto = plainToClass(CreateFilmDto, rawFilm);

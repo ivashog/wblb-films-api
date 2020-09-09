@@ -1,12 +1,11 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import * as path from 'path';
 
+import { appConfig, configValidationSchema } from './config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { appConfig, configValidationSchema, databaseConfig, DB_CONFIG_TOKEN } from './config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { LoggingInterceptor } from './shared/interceptors/logging.interceptor';
 import { FilmsModule } from './films/films.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -26,12 +25,7 @@ import { PrismaExceptionFilter } from './prisma/prisma-exception.filter';
                 allowUnknown: true,
                 abortEarly: false,
             },
-            load: [appConfig, databaseConfig],
-        }),
-        TypeOrmModule.forRootAsync({
-            useFactory: (config: ConfigService) =>
-                config.get<TypeOrmModuleOptions>(DB_CONFIG_TOKEN),
-            inject: [ConfigService],
+            load: [appConfig],
         }),
         PrismaModule,
         FilmsModule,

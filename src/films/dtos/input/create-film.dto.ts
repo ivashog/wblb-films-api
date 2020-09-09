@@ -8,7 +8,7 @@ import { Expose, Transform } from 'class-transformer';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { EnumValues } from 'enum-values';
 
-import { FilmFormats } from '../../../database/enums';
+import { FilmFormats } from '../../enums';
 
 export class CreateFilmDto implements FilmCreateInput {
     @IsString()

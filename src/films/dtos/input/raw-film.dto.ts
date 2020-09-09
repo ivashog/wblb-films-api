@@ -1,4 +1,4 @@
-import { CreateFilmDto } from './input/create-film.dto';
+import { CreateFilmDto } from './create-film.dto';
 
 export type RawFilm = Record<keyof Omit<CreateFilmDto, 'format' | 'actors'>, string>;
 
