@@ -1,4 +1,4 @@
-import { IsOptional, MinLength } from 'class-validator';
+import { IsOptional, MinLength, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SearchFilmsDto {

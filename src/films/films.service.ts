@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FilmResponseDto } from './dtos/output/film-response.dto';
 import { PrismaErrorCodesEnum } from '../prisma/prisma-error-codes.enum';
 import { EnumValues } from 'enum-values';
+import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
 
 @Injectable()
 export class FilmsService {
@@ -53,9 +54,19 @@ export class FilmsService {
         });
     }
 
-    @TransformClassToClass()
-    async findOne(id: number): Promise<FilmEntity | undefined> {
-        return await this.filmRepository.findOne(id);
+    @TransformPlainToClass(FilmDetailResponseDto)
+    getById(id: number) {
+        return this.prisma.film.findOne({
+            select: {
+                id: true,
+                name: true,
+                releaseYear: true,
+                createdAt: true,
+                actors: true,
+                format: { select: { name: true } },
+            },
+            where: { id },
+        });
     }
 
     async find(searchDto: SearchFilmsDto): Promise<FilmEntity[]> {
@@ -73,55 +84,6 @@ export class FilmsService {
 
         return await qb.getMany();
     }
-
-    // async create(filmDto: CreateFilmDto): Promise<CreatedFilmResponseDto> {
-    //     const { actorsList, ...film } = filmDto;
-    //     const actorsEntities = actorsList
-    //         .split(',')
-    //         .filter(a => a.trim())
-    //         .map(actorName =>
-    //             plainToClass(ActorEntity, {
-    //                 fullName: actorName.trim(),
-    //             }),
-    //         );
-    //
-    //     return await this.connection.transaction(async manager => {
-    //         try {
-    //             const newFilm = await manager.save(plainToClass(FilmEntity, film));
-    //
-    //             const { generatedMaps: createdActors } = await manager
-    //                 .createQueryBuilder()
-    //                 .insert()
-    //                 .into(ActorEntity)
-    //                 .values(actorsEntities)
-    //                 .onConflict(
-    //                     `
-    //                 (full_name) DO UPDATE
-    //                 SET films_count = actors.films_count + 1,
-    //                     created_at  = actors.created_at,
-    //                     updated_at  = EXCLUDED.updated_at`,
-    //                 )
-    //                 .returning('*')
-    //                 .execute();
-    //
-    //             const filmActorsEntities = createdActors.map(newActor =>
-    //                 plainToClass(FilmActorEntity, {
-    //                     film: newFilm.id,
-    //                     actor: newActor,
-    //                 }),
-    //             );
-    //             await manager.save(filmActorsEntities);
-    //
-    //             return {
-    //                 id: newFilm.id,
-    //                 name: newFilm.name,
-    //             };
-    //         } catch (e) {
-    //             Logger.error('Error in film creation transaction: ' + e.message);
-    //             return null;
-    //         }
-    //     });
-    // }
 
     async delete(id: number) {
         return await this.filmRepository.delete(id);

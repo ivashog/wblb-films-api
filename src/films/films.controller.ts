@@ -28,6 +28,7 @@ import { FilmEntity } from '../database/entities/film.entity';
 import { FilmsImportResDto } from './dtos/films-import-res.dto';
 import { SearchFilmsDto } from './dtos/search-films.dto';
 import { SortingDto } from './dtos/input/sorting.dto';
+import { FilmDetailResponseDto } from './dtos/output/film-detail-response.dto';
 
 @Controller('films')
 @ApiTags('Films routes')
@@ -62,8 +63,9 @@ export class FilmsController {
 
     @Get('/:id')
     @ApiOperation({ summary: 'Get film detail info by id' })
-    async getOneDetails(@Param('id', ParseIntPipe) id: number): Promise<FilmEntity> {
-        const film = await this.filmsService.findOne(id);
+    @ApiOkResponse({ type: FilmDetailResponseDto })
+    async getOneDetails(@Param('id', ParseIntPipe) id: number) {
+        const film = await this.filmsService.getById(id);
         if (!film) {
             throw new NotFoundException(`Film with id ${id} is not founded!`);
         }
@@ -74,7 +76,7 @@ export class FilmsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete film by id' })
     async dropFilm(@Param('id', ParseIntPipe) id: number) {
-        const film = await this.filmsService.findOne(id);
+        const film = await this.filmsService.getById(id);
         if (!film) {
             throw new NotFoundException(`Film with id ${id} is not founded!`);
         }
